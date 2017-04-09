@@ -13,5 +13,45 @@
 
 (function() {
   // Magic!
-  console.log('Keepin\'n it clean with an external script!');
-})();
+  //console.log('Keepin\'n it clean with an external script!');
+  var input_from_user = $(".flexsearch-input").after("<br><div class='ac-display'></div>");
+
+  var outputdata = new Array();
+  $.when(
+    $.ajax({
+    type: 'GET',
+    dataType: 'JSON',
+    url: 'http://www.mattbowytz.com/simple_api.json?data=all',
+    success: function(data) {
+    	$.when(
+    		outputdata = outputdata.concat(data.data.interests),
+    		outputdata = outputdata.concat(data.data.programming)
+    	).then(function() {
+		  	console.log(outputdata)
+		  	console.log("success.");
+		  }); //this closes when/then
+		} //this closes success
+  })//this closes the ajax call
+  ).done(function() {
+
+    $(".ac-display").html("");
+    for(var i = 0; i < outputdata.length; i++) {
+      $(".ac-display").append(outputdata[i] + "<br>");
+    }
+
+    input_from_user.on("keyup", function(event){
+      var input = input_from_user.val().toUpperCase();
+      var to_display = [];
+      for(var i  = 0; i < outputdata.length; i++) {
+        if(outputdata[i].toUpperCase().indexOf(input) != -1) {
+          to_display.push(outputdata[i]);
+        }
+      }
+      
+      $(".ac-display").html("");
+        for(i = 0; i < to_display.length; i++) {
+          $(".ac-display").append(to_display[i] + "<br>");
+        }
+    });
+  });	//end of when/then
+})(); //this is the very last ending thing
